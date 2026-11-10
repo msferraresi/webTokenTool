@@ -1,12 +1,36 @@
 # -*- mode: python ; coding: utf-8 -*-
+from PyInstaller.utils.hooks import collect_all
 
+datas = [('static', 'static'), ('config', 'config')]
+
+# Si existe la carpeta resource, la sumamos a los datos
+import os
+icon_path = 'resource/checked.png' if os.path.exists('resource/checked.png') else None
+if os.path.exists('resource'):
+    datas.append(('resource', 'resource'))
+
+# Colectar submódulos de uvicorn y fastapi que suelen perderse
+for pkg in ['uvicorn', 'fastapi', 'selenium', 'webdriver_manager', 'pystray']:
+    pkg_datas, pkg_binaries, pkg_hiddenimports = collect_all(pkg)
+    datas += pkg_datas
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('static', 'static'), ('resource', 'resource'), ('config', 'config')],
-    hiddenimports=[],
+    datas=datas,
+    hiddenimports=[
+        'uvicorn.logging',
+        'uvicorn.loops',
+        'uvicorn.loops.auto',
+        'uvicorn.protocols',
+        'uvicorn.protocols.http',
+        'uvicorn.protocols.http.auto',
+        'uvicorn.protocols.websockets',
+        'uvicorn.protocols.websockets.auto',
+        'uvicorn.lifespans',
+        'uvicorn.lifespans.on',
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -22,18 +46,18 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='main',
+    name='WebTokenTool',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,
+    console=True,  # Dejalo en True mientras depuras para ver excepciones en terminal
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['resource\\checked.png'],
+    icon=[icon_path] if icon_path else [],
 )
