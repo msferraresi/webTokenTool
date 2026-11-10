@@ -1,0 +1,6 @@
+{
+    "api_port": 5000,
+    "login_url": "https://self-dev.fedpat.com.ar/reclamos/ui#/login",
+    "target_variable": "accessToken",
+    "browser_visible": true
+}

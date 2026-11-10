@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>WebTokenTool - Config</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-900 text-white p-8">
+    <div
+      class="max-w-md mx-auto bg-slate-800 p-6 rounded-xl shadow-2xl border border-slate-700"
+    >
+      <h1 class="text-2xl font-bold mb-6 flex items-center gap-2">
+        ⚙️ Configuración
+      </h1>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm text-slate-400 mb-1">Puerto API</label>
+          <input
+            id="api_port"
+            type="number"
+            class="w-full bg-slate-700 border-none rounded p-2 text-white"
+          />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-1">URL de Login</label>
+          <input
+            id="login_url"
+            type="text"
+            class="w-full bg-slate-700 border-none rounded p-2 text-white"
+          />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-1"
+            >Variable en JSON</label
+          >
+          <input
+            id="target_variable"
+            type="text"
+            class="w-full bg-slate-700 border-none rounded p-2 text-white"
+          />
+        </div>
+        <div class="flex items-center gap-2 pt-2">
+          <input id="browser_visible" type="checkbox" class="w-4 h-4 rounded" />
+          <label class="text-sm text-slate-400"
+            >Mostrar Navegador (Recomendado para Captcha)</label
+          >
+        </div>
+
+        <button
+          onclick="saveConfig()"
+          class="w-full bg-blue-600 hover:bg-blue-500 py-2 rounded font-bold transition mt-4"
+        >
+          Guardar y Reiniciar
+        </button>
+      </div>
+    </div>
+
+    <script>
+      async function loadConfig() {
+        const res = await fetch("/api/config");
+        const data = await res.json();
+        document.getElementById("api_port").value = data.api_port;
+        document.getElementById("login_url").value = data.login_url;
+        document.getElementById("target_variable").value = data.target_variable;
+        document.getElementById("browser_visible").checked =
+          data.browser_visible;
+      }
+
+      async function saveConfig() {
+        const config = {
+          api_port: parseInt(document.getElementById("api_port").value),
+          login_url: document.getElementById("login_url").value,
+          target_variable: document.getElementById("target_variable").value,
+          browser_visible: document.getElementById("browser_visible").checked,
+        };
+
+        await fetch("/api/config", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(config),
+        });
+        alert(
+          "Configuración guardada. Reinicia la aplicación para aplicar cambios de puerto.",
+        );
+      }
+      loadConfig();
+    </script>
+  </body>
+</html>
